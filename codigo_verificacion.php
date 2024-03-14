@@ -15,7 +15,7 @@
 	<meta name="format-detection" content="telephone=no">
 	
 	<!-- PAGE TITLE HERE -->
-	<title>Admin Dashboard</title>
+        <title>Cosigo</title>
 	
 	<!-- FAVICONS ICON -->
 	<link rel="shortcut icon" type="image/png" href="images/favicon.png">
@@ -32,37 +32,20 @@
                         <div class="row no-gutters">
                             <div class="col-xl-12">
                                 <div class="auth-form">
-									<div class="text-center mb-3">
-										<a href="index.html"><img src="images/logo-full.png" alt=""></a>
-									</div>
-                                    <h4 class="text-center mb-4">Sign in your account</h4>
-                                    <form action="index.html">
+                                    <div class="text-center mb-3">
+                                        <a href="codigo_verificacion.php"><img src="images/logo_2.png" alt=""></a>
+                                    </div>
+                                    <h4 class="text-center mb-4">Verificar Código</h4>
+                                    <form action="codigo_verificacion.php" method="POST"> <!-- Cambiado el action -->
                                         <div class="mb-3">
-                                            <label class="mb-1"><strong>Email</strong></label>
-                                            <input type="email" class="form-control" value="hello@example.com">
+                                            <label><strong>Código de Verificación</strong></label>
+                                            <input type="text" class="form-control" name="codigo">
                                         </div>
-                                        <div class="mb-3">
-                                            <label class="mb-1"><strong>Password</strong></label>
-                                            <input type="password" class="form-control" value="Password">
-                                        </div>
-                                        <div class="row d-flex justify-content-between mt-4 mb-2">
-                                            <div class="mb-3">
-                                               <div class="form-check custom-checkbox ms-1">
-													<input type="checkbox" class="form-check-input" id="basic_checkbox_1">
-													<label class="form-check-label" for="basic_checkbox_1">Remember my preference</label>
-												</div>
-                                            </div>
-                                            <div class="mb-3">
-                                                <a href="page-forgot-password.html">Forgot Password?</a>
-                                            </div>
-                                        </div>
+                                        <input type="hidden" name="email" value="<?php echo $_GET['email']; ?>"> <!-- Agregado campo oculto para pasar el email -->
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary btn-block">Sign Me In</button>
+                                            <button type="submit" class="btn btn-primary btn-block">VERIFICAR</button>
                                         </div>
                                     </form>
-                                    <div class="new-account mt-3">
-                                        <p>Don't have an account? <a class="text-primary" href="page-register.html">Sign up</a></p>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -71,6 +54,7 @@
             </div>
         </div>
     </div>
+
 
 
     <!--**********************************
@@ -83,3 +67,26 @@
 	<script src="js/styleSwitcher.js"></script>
 </body>
 </html>
+<?php
+// Incluir el archivo de conexión
+include 'conexion.php';
+
+// Verificar si se ha enviado el código y el correo electrónico
+if(isset($_POST['codigo'], $_POST['email'])) {
+    $codigo = $_POST['codigo'];
+    $email = $_POST['email'];
+
+    // Consultar si el código coincide con uno válido en la base de datos
+    $consulta_codigo = "SELECT * FROM codigos_recuperacion WHERE codigo = '$codigo' AND correo_electronico = '$email' AND fecha_expiracion > NOW()";
+    $resultado_codigo = $conexion->query($consulta_codigo);
+
+    if ($resultado_codigo->num_rows > 0) {
+        // El código es válido, redirigir al usuario a cambiar_contrasena.php
+        header("Location: cambiar_contraseña.php?email=$email");
+        exit();
+    } else {
+        // El código no es válido
+        echo "El código ingresado no es válido o ha expirado.";
+    }
+}
+?>
