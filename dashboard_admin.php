@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿<?php
+// Iniciar la sesión
+session_start();
+
+// Iniciar sesión y redirigir según el rol
+$_SESSION['usuario_id'] = $usuario['id'];
+$_SESSION['nombre_usuario'] = $usuario['nombre_usuario'];
+$_SESSION['rol'] = $usuario['rol']; // Agrega esta línea para establecer el rol del usuario en la sesión
+
+?>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -58,7 +69,20 @@
 				</svg>
 				<div class="brand-title">
 					<h2 class="">Sofmis</h2>
-					<span class="brand-sub-title">@soengsouy</span>
+					<?php
+						// Verificar si el usuario ha iniciado sesión
+						if (isset($_SESSION['usuario_id'])) {
+							// Obtener el rol del usuario
+							$rol_usuario = $_SESSION['rol'];
+
+							// Imprimir el rol del usuario
+							echo '<span class="brand-sub-title">' . $rol_usuario . '</span>';
+						} else {
+							// Si el usuario no ha iniciado sesión, puedes manejar esto de alguna manera
+							echo '<span class="brand-sub-title">Rol no disponible</span>';
+						}
+						?>
+
 				</div>
             </a>
             <div class="nav-control">

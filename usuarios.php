@@ -1038,7 +1038,7 @@
                         <span class="input-group-text"><a href="javascript:void(0)"><i class="flaticon-381-search-2"></i></a></span>
                     </div>
                     <div class="mb-4">
-                        <a href="javascript:void(0);" class="btn btn-primary btn-rounded fs-18">+ New Contact</a>
+                        <a href="registrar.php" class="btn btn-primary btn-rounded fs-18">+ New Contact</a>
                     </div>
                 </div>
                 <div class="row">
@@ -1079,7 +1079,7 @@
                                     echo "<span class='active'></span>";
                                     echo "</div>";
                                     echo "<div class='media-body user-meta-info'>";
-                                    echo "<h6 class='fs-18 font-w600 my-1'><a href='app-profile.html' class='text-black user-name' data-name='Alan Green'>" . $row["nombre_usuario"] . "</a></h6>";
+                                    echo "<h6 class='fs-18 font-w600 my-1'><div href='' class='text-black user-name' data-name='Alan Green'>" . $row["nombre_usuario"] . "</div></h6>";
                                     echo "<p class='fs-14 mb-3 user-work' data-occupation='UI Designer'>" . $row["rol"] . "</p>";
                                     echo "<ul>";
                                     echo "<li><a href='javascript:void(0);'><i class='fas fa-phone-alt'></i></a></li>";

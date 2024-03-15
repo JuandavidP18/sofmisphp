@@ -22,20 +22,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($usuario['cuenta_habilitada']) {
             // Verificar la contraseña
             if (password_verify($contrasena, $usuario['contrasena'])) {
-                // Iniciar sesión y redirigir al dashboard o a donde sea necesario
+                // Iniciar sesión y redirigir según el rol
                 $_SESSION['usuario_id'] = $usuario['id'];
                 $_SESSION['nombre_usuario'] = $usuario['nombre_usuario'];
-                // Redirigir al dashboard o a la página deseada
-                header("Location: dashboard.php");
-                exit();
+
+                if ($usuario['rol'] == 'administrador') {
+                    // Redirigir al panel de administrador
+                    echo json_encode(["redirect" => "dashboard_admin.php"]);
+                    exit();
+                } elseif ($usuario['rol'] == 'cajero') {
+                    // Redirigir al panel de cajero
+                    echo json_encode(["redirect" => "dashboard_cajero.php"]);
+                    exit();
+                } else {
+                    // Rol desconocido, puedes manejar esto según tus necesidades
+                    echo json_encode(["error" => "Rol de usuario desconocido."]);
+                    exit();
+                }
             } else {
-                echo "La contraseña es incorrecta.";
+                // Devolver un error de contraseña incorrecta
+                echo json_encode(["error" => "La contraseña es incorrecta."]);
+                exit();
             }
         } else {
-            echo "La cuenta aún no ha sido habilitada. Por favor, espere a que se habilite su cuenta.";
+            // Devolver un error de cuenta no habilitada
+            echo json_encode(["error" => "La cuenta aún no ha sido habilitada. Por favor, espere a que se habilite su cuenta."]);
+            exit();
         }
     } else {
-        echo "No se encontró ninguna cuenta asociada a ese correo electrónico.";
+        // Devolver un error de cuenta no encontrada
+        echo json_encode(["error" => "No se encontró ninguna cuenta asociada a ese correo electrónico."]);
+        exit();
     }
 }
 

@@ -15,11 +15,12 @@
 	<meta name="format-detection" content="telephone=no">
 	
 	<!-- PAGE TITLE HERE -->
-	<title>Admin Dashboard</title>
+	<title>Recuperar</title>
 	
 	<!-- FAVICONS ICON -->
 	<link rel="shortcut icon" type="image/png" href="images/favicon.png">
     <link href="css/style.css" rel="stylesheet">
+    <link href="css/mio.css" rel="stylesheet">
 
 </head>
 
@@ -32,17 +33,21 @@
                         <div class="row no-gutters">
                             <div class="col-xl-12">
                                 <div class="auth-form">
-                                    <div class="text-center mb-3">
-                                        <a href="recuperar.php"><img src="images/logo-full.png" alt=""></a>
+                                <div class="text-center mb-3">
+                                        <div class="nombre_logo">
+                                            <a href="recuperar.php"><img class="logo" src="images/logo.png" alt=""></a>
+                                            <h1>SOFMIS</h1>
+                                        </div>
                                     </div>
-                                    <h4 class="text-center mb-4">Forgot Password</h4>
-                                    <form action="recuperar.php" method="POST"> <!-- Modificado el action -->
+                                    <h4 class="text-center mb-4">Has olvidado tu Contraseña</h4>
+                                    <form action="recuperar.php" method="POST" id="formulario-recuperar">
                                         <div class="mb-3">
-                                            <label><strong>Email</strong></label>
-                                            <input type="email" class="form-control" name="email" required> <!-- Añadido el atributo name -->
+                                            <label><strong>Ingresa tu Correo</strong></label>
+                                            <input type="email" class="form-control" name="email" id="correo-recuperar" required>
+                                            <div id="mensaje-correo-recuperar" style="color: red; display: none;">El correo no debe superar los 64 caracteres.</div>
                                         </div>
                                         <div class="text-center">
-                                            <button type="submit" class="btn btn-primary btn-block">SUBMIT</button>
+                                            <button type="submit" class="btn btn-primary btn-block">Enviar</button>
                                         </div>
                                     </form>
                                 </div>
@@ -53,7 +58,18 @@
             </div>
         </div>
     </div>
-
+    <script>
+document.getElementById('formulario-recuperar').addEventListener('submit', function(event) {
+    var correoRecuperarInput = document.getElementById('correo-recuperar');
+    var correoRecuperar = correoRecuperarInput.value.trim();
+    if (correoRecuperar.length > 64) {
+        event.preventDefault();
+        document.getElementById('mensaje-correo-recuperar').style.display = 'block';
+    } else {
+        document.getElementById('mensaje-correo-recuperar').style.display = 'none';
+    }
+});
+</script>
 
     <!--**********************************
         Scripts
