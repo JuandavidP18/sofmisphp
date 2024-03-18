@@ -1064,8 +1064,14 @@ if (!isset($_SESSION['usuario_id'])) {
                             <li class="breadcrumb-item active"><a href="javascript:void(0)">Productos</a></li>
                             <li class="breadcrumb-item"><a href="javascript:void(0)">Inventario</a></li>
                         </ol>
-                        <button type="button" class="btn btn-rounded btn-info" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"><span class="btn-icon-start text-info"><i class="fa fa-plus color-info"></i>
-                            </span>Activar Seleccionados</button>
+                        <div class="row">
+                            <div class="nombre_logo">
+                                <button type="button" class="btn btn-primary">
+                                    </span>Eliminar</button>
+                                <button type="button" class="btn btn-primary">
+                                    </span>Restaurar</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- row -->
@@ -1100,7 +1106,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                         <tbody>
                                             <?php
                                             // Consulta SQL para seleccionar todos los productos
-                                            $sql = "SELECT * FROM Productos";
+                                            $sql = "SELECT * FROM Productos WHERE eliminacion = 'Si'";
                                             $resultado = $conexion->query($sql);
 
                                             // Comprobar si se encontraron resultados
@@ -1133,8 +1139,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                                     echo '</td>';
                                                     echo '<td>';
                                                     echo '<div class="d-flex">';
-                                                    echo '<a href="#" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>';
-                                                    echo '<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>';
+                                                    echo '<a href="#" class="btn btn-danger shadow btn-xs sharp eliminar-btn"   data-id="' . $row['id'] . '"><i class="fa fa-trash"></i></a>';
                                                     echo '</div>';
                                                     echo '</td>';
                                                     echo '</tr>';
@@ -1155,6 +1160,43 @@ if (!isset($_SESSION['usuario_id'])) {
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="ModalEliminarProducto" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Confirmación de Eliminación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Estás seguro que deseas eliminar este producto? <br>
+                                Ya no se podra recuperar este producto
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Cancelar</button>
+                                <!-- Formulario para enviar el ID del producto a marcar como eliminado -->
+                                <form action="eliminar_producto.php" method="POST">
+                                    <input type="hidden" id="id_producto_el" name="id_producto">
+                                    <button type="submit" class="btn btn-primary">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    $(document).on("click", ".eliminar-btn", function() {
+                        var id = $(this).data('id');
+                        // Asignar los datos del producto a los campos del formulario modal
+                        $("#id_producto_el").val(id);
+
+                        // Abrir el modal
+                        $("#ModalEliminarProducto").modal("show");
+                    });
+                </script>
             <!--**********************************
             Content body end
         ***********************************-->

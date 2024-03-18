@@ -14,3 +14,9 @@
     display: flex;
     justify-content: space-between;
 }
+.form_formulario{
+    border: none;
+    border-radius: 8px;
+    width: 100px;
+    color: #89879f;
+}

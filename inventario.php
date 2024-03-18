@@ -655,7 +655,7 @@ if (!isset($_SESSION['usuario_id'])) {
                     <div class="collapse navbar-collapse justify-content-between">
                         <div class="header-left">
                             <div class="dashboard_bar">
-                                Table-Data-Table
+                                Lista de Productos
                             </div>
 
                         </div>
@@ -1177,7 +1177,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                         <tbody>
                                             <?php
                                             // Consulta SQL para seleccionar solo los productos con estado 'Activo'
-                                            $sql = "SELECT * FROM Productos WHERE estado = 'Activo'";
+                                            $sql = "SELECT * FROM Productos WHERE estado = 'Activo' AND eliminacion = 'No'";
                                             $resultado = $conexion->query($sql);
 
                                             // Comprobar si se encontraron resultados
@@ -1205,7 +1205,8 @@ if (!isset($_SESSION['usuario_id'])) {
                                                     echo '<td>';
                                                     echo '<div class="d-flex">';
                                                     echo '<a href="#" class="btn btn-primary shadow btn-xs sharp me-1 edit-btn" data-imagen="' . $row['imagen'] . '" data-id="' . $row['id'] . '" data-nombre="' . $row['nombre'] . '" data-codigo="' . $row['codigo'] . '" data-categoria="' . $row['categoria'] . '" data-marca="' . $row['marca'] . '" data-precio="' . $row['precio'] . '" data-stock="' . $row['stock'] . '" data-estado="' . $row['estado'] . '"><i class="fas fa-pencil-alt"></i></a>';
-                                                    echo '<a href="#" class="btn btn-danger shadow btn-xs sharp"><i class="fa fa-trash"></i></a>';
+                                                    echo '<a href="#" class="btn btn-danger shadow btn-xs sharp eliminar-btn"   data-id="' . $row['id'] . '"><i class="fa fa-trash"></i></a>';
+                                                    echo '</div>';
                                                     echo '</div>';
                                                     echo '</td>';
                                                     echo '</tr>';
@@ -1225,6 +1226,48 @@ if (!isset($_SESSION['usuario_id'])) {
                     </div>
                 </div>
 
+                <!-- Modal de eliminacion -->
+                <!-- Modal de eliminación -->
+                <div class="modal fade" id="ModalEliminarProducto" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Confirmación de Eliminación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Estás seguro que deseas marcar este producto como eliminado? <br>
+                                El producto se eliminara totalmente en 30 días
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Cancelar</button>
+                                <!-- Formulario para enviar el ID del producto a marcar como eliminado -->
+                                <form action="marcar_eliminacion.php" method="POST">
+                                    <input type="hidden" id="id_producto_el" name="id_producto">
+                                    <button type="submit" class="btn btn-primary">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    $(document).on("click", ".eliminar-btn", function() {
+                        var id = $(this).data('id');
+                        // Asignar los datos del producto a los campos del formulario modal
+                        $("#id_producto_el").val(id);
+
+                        // Abrir el modal
+                        $("#ModalEliminarProducto").modal("show");
+                    });
+                </script>
+
+
+
+
                 <!-- Modal de Edición -->
                 <div class="modal fade" id="modalEditar" tabindex="-1" role="dialog" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
@@ -1234,7 +1277,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <form action="actualizar_producto.php" method="POST">
+                                <form action="actualizar_producto.php" method="POST" enctype="multipart/form-data">
                                     <!-- Los campos ocultos para almacenar los datos del producto -->
                                     <input type="hidden" id="id_producto" name="producto_id">
                                     <div class="row">
@@ -1276,7 +1319,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                         </div>
                                         <div class="mb-3 col-md-6">
                                             <label for="cantidad_stock" class="form-label">Cantidad de Stock</label>
-                                            <input type="number" id="cantidad_stock"  name="cantidad_stock" class="form-control" placeholder="Cantidad de stock" required>
+                                            <input type="number" id="cantidad_stock" name="cantidad_stock" class="form-control" placeholder="Cantidad de stock" required>
                                         </div>
                                         <div class="mb-3 col-md-6">
                                             <label class="form-label">Cambiar Imagen</label>
@@ -1321,7 +1364,6 @@ if (!isset($_SESSION['usuario_id'])) {
                         </div>
                     </div>
                 </div>
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script>
                     $(document).on("click", ".edit-btn", function() {
                         var id = $(this).data('id');
@@ -1362,6 +1404,8 @@ if (!isset($_SESSION['usuario_id'])) {
                         $("#modalEditar").modal("show");
                     });
                 </script>
+
+
 
 
 

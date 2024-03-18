@@ -28,26 +28,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $actualizaciones[] = "precio=$precio";
     }
 
-    // Verificar si se ha enviado una nueva imagen
-    if (isset($_FILES['imagen_nueva']['name']) && $_FILES['imagen_nueva']['name'] != '') {
-        // Ruta de almacenamiento de la imagen
-        $directorio = "imagenes_productos/";
+    // Verificar si se ha seleccionado un proveedor
+    if (isset($_POST['proveedor'])) {
+        $proveedor_id = $_POST['proveedor'];
+        $actualizaciones[] = "proveedor_id=$proveedor_id";
+    }
 
-        // Obtener la extensión del archivo
-        $extension = pathinfo($_FILES['imagen_nueva']['name'], PATHINFO_EXTENSION);
+    // Verificar si se ha cargado una nueva imagen
+    if ($_FILES['imagen_nueva']['name'] != '') {
+        // Ruta de almacenamiento de la imagen
+        $carpeta_imagenes = "imagenes_productos/";
 
         // Nombre de archivo único basado en el timestamp actual
-        $nombre_archivo = time() . '.' . $extension;
+        $nombre_imagen = $categoria . "_" . $nombre . "_" . uniqid() . ".png";
 
         // Ruta completa del archivo
-        $ruta_archivo = $directorio . $nombre_archivo;
+        $ruta_imagen = $carpeta_imagenes . $nombre_imagen;
 
         // Mover la imagen a la carpeta de destino
-        move_uploaded_file($_FILES['imagenes_producto/']['tmp_name'], $ruta_archivo);
+        if (!move_uploaded_file($_FILES['imagen_nueva']['tmp_name'], $ruta_imagen)) {
+            echo "Error al subir la imagen.";
+            exit(); // Detener el script si hay un error
+        }
 
         // Agregar la actualización de la imagen al array de actualizaciones
-        $actualizaciones[] = "imagen='$ruta_archivo'";
+        $actualizaciones[] = "imagen='$ruta_imagen'";
     }
+
 
     // Verificar si se han enviado datos de stock
     if (isset($_POST['accion_stock']) && isset($_POST['cantidad_stock'])) {
@@ -62,12 +69,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Verificar si se ha seleccionado un proveedor
-    if (isset($_POST['proveedor'])) {
-        $proveedor_id = $_POST['proveedor'];
-        $actualizaciones[] = "proveedor_id=$proveedor_id";
-    }
-
     // Construir la consulta SQL de actualización
     $sql_update = "UPDATE Productos SET " . implode(", ", $actualizaciones) . " WHERE id=$producto_id";
 
@@ -80,4 +81,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Error al actualizar el producto: " . $conexion->error;
     }
 }
-?>
