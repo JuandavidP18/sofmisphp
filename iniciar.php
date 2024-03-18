@@ -22,17 +22,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($usuario['cuenta_habilitada']) {
             // Verificar la contraseña
             if (password_verify($contrasena, $usuario['contrasena'])) {
-                // Iniciar sesión y redirigir según el rol
-                $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['nombre_usuario'] = $usuario['nombre_usuario'];
-
+                // Determinar qué tipo de dashboard cargar para ese usuario
                 if ($usuario['rol'] == 'administrador') {
                     // Redirigir al panel de administrador
-                    echo json_encode(["redirect" => "dashboard_admin.php"]);
+                    $_SESSION['usuario_id'] = $usuario['id'];
+                    $_SESSION['nombre_usuario'] = $usuario['nombre_usuario'];
+                    $_SESSION['rol'] = $usuario['rol'];
+                    header("Location: dashboard_admin.php");
                     exit();
                 } elseif ($usuario['rol'] == 'cajero') {
                     // Redirigir al panel de cajero
-                    echo json_encode(["redirect" => "dashboard_cajero.php"]);
+                    $_SESSION['usuario_id'] = $usuario['id'];
+                    $_SESSION['nombre_usuario'] = $usuario['nombre_usuario'];
+                    $_SESSION['rol'] = $usuario['rol'];
+                    header("Location: dashboard_cajero.php");
                     exit();
                 } else {
                     // Rol desconocido, puedes manejar esto según tus necesidades

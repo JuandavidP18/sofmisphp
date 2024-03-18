@@ -10,3 +10,7 @@
 .nombre_logo h1{
     margin-top: 5px;
 }
+.diseño_titulos{
+    display: flex;
+    justify-content: space-between;
+}

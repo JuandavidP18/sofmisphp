@@ -1,3 +1,29 @@
+<?php
+// Incluir el archivo de conexión
+include 'conexion.php';
+
+// Iniciar la sesión
+session_start();
+
+// Verificar si ya hay una sesión activa
+if (isset($_SESSION['usuario_id'])) {
+    // Obtener el rol del usuario
+    $rol_usuario = $_SESSION['rol'];
+
+    // Redirigir al dashboard correspondiente según el rol del usuario
+    if ($rol_usuario == 'administrador') {
+        header("Location: dashboard_admin.php");
+        exit();
+    } elseif ($rol_usuario == 'cajero') {
+        header("Location: dashboard_cajero.php");
+        exit();
+    }
+}
+
+// Resto del código de tu archivo login.php
+// ...
+?>
+
 <!DOCTYPE html>
 <html lang="es" class="h-100">
 
@@ -84,13 +110,8 @@
             xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    if (response.error) {
-                        document.getElementById('mensaje-error').style.display = 'block';
-                    } else {
-                        // Redirigir al dashboard u otra página de inicio de sesión exitosa
-                        window.location.href = response.redirect;
-                    }
+                    // Redirigir al dashboard u otra página de inicio de sesión exitosa
+                    window.location.href = xhr.responseURL;
                 }
             };
             xhr.send('correo_electronico=' + encodeURIComponent(correoIniciar) + '&contrasena=' + encodeURIComponent(contrasenaIniciar));

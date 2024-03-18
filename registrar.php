@@ -1,3 +1,29 @@
+<?php
+// Incluir el archivo de conexión
+include 'conexion.php';
+
+// Iniciar la sesión
+session_start();
+
+// Verificar si ya hay una sesión activa
+if (isset($_SESSION['usuario_id'])) {
+    // Obtener el rol del usuario
+    $rol_usuario = $_SESSION['rol'];
+
+    // Redirigir al dashboard correspondiente según el rol del usuario
+    if ($rol_usuario == 'administrador') {
+        header("Location: dashboard_admin.php");
+        exit();
+    } elseif ($rol_usuario == 'cajero') {
+        header("Location: dashboard_cajero.php");
+        exit();
+    }
+}
+
+// Resto del código de tu archivo login.php
+// ...
+?>
+
 <!DOCTYPE html>
 <html lang="es" class="h-100">
 
@@ -120,8 +146,6 @@ document.getElementById('formulario').addEventListener('submit', function(event)
 
 </html>
 <?php
-// Incluir el archivo de conexión
-include 'conexion.php';
 
 // Verificar si se han enviado datos del formulario
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
