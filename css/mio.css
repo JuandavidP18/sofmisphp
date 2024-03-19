@@ -41,3 +41,8 @@
 .mostrar_productos:hover{
     border: 1px solid #886CC0;
 }
+.imagen_lista_productos{
+    height: 100px;
+    width: 100px;
+    border: none;
+}

@@ -1072,58 +1072,56 @@ if (!isset($_SESSION['usuario_id'])) {
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title">Realizar venta</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                                </button>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
                                     <div class="col-xl-12">
                                         <div class="card">
                                             <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-lg-4 order-lg-2 mb-4">
-                                                        <h4 class="d-flex justify-content-between align-items-center mb-3">
-                                                            <span class="text-muted">Carrito</span>
-                                                            <span class="badge badge-primary badge-pill">3</span>
-                                                        </h4>
-                                                        <ul class="list-group mb-3" id="productos-seleccionados">
-                                                            <!-- Aquí se mostrarán los productos seleccionados -->
-
-                                                        </ul>
-                                                        <li class="list-group-item d-flex justify-content-between">
-                                                            <span>Total (COL)</span>
-                                                            <strong id="total-colombiano">$0</strong>
-                                                        </li>
-                                                    </div>
-                                                    <div class="col-lg-8 order-lg-1">
-                                                        <h4 class="mb-3">Registrar</h4>
-                                                        <form class="needs-validation" novalidate="">
+                                                <form action="agregar_venta.php" method="post">
+                                                    <div class="row">
+                                                        <div class="col-lg-4 order-lg-2 mb-4">
+                                                            <h4 class="d-flex justify-content-between align-items-center mb-3">
+                                                                <span class="text-muted">Carrito</span>
+                                                                <span class="badge badge-primary badge-pill" id="contador-productos-seleccionados">0</span>
+                                                            </h4>
+                                                            <ul class="list-group mb-3" id="productos-seleccionados">
+                                                                <!-- Aquí se mostrarán los productos seleccionados -->
+                                                            </ul>
+                                                            <li class="list-group-item d-flex justify-content-between">
+                                                                <span>Total (COL)</span>
+                                                                <strong id="total-colombiano">$0</strong>
+                                                                <input type="hidden" id="total_venta" name="total_venta" value="0">
+                                                            </li>
+                                                        </div>
+                                                        <div class="col-lg-8 order-lg-1">
+                                                            <h4 class="mb-3">Registrar</h4>
                                                             <div class="row">
                                                                 <div class="col-md-6 mb-3">
-                                                                    <label for="firstName" class="form-label">Nombre</label>
-                                                                    <input type="text" class="form-control" id="Nombre" placeholder="" value="" required="">
+                                                                    <label for="Nombre" class="form-label">Nombre</label>
+                                                                    <input type="text" class="form-control" id="Nombre" name="Nombre" placeholder="" value="" required="">
                                                                     <div class="invalid-feedback">
-                                                                        Se requiere un nombre valido
+                                                                        Se requiere un nombre válido
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6 mb-3">
-                                                                    <label for="lastName" class="form-label">Numero identificacion</label>
-                                                                    <input type="number" class="form-control" id="Identificacion" placeholder="" value="" required="">
+                                                                    <label for="Identificacion" class="form-label">Número identificación</label>
+                                                                    <input type="number" class="form-control" id="Identificacion" name="Identificacion" placeholder="" value="" required="">
                                                                     <div class="invalid-feedback">
-                                                                        Numero invalido
+                                                                        Número inválido
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                             <div class="mb-3">
-                                                                <label for="username" class="form-label">Correo electrónico</label>
+                                                                <label for="email" class="form-label">Correo electrónico</label>
                                                                 <div class="input-group">
                                                                     <span class="input-group-text">@</span>
-                                                                    <input type="email" class="form-control" placeholder="Correo" required>
-                                                                    <div class="invalid-feedback" style="width: 100%;">Correo Inválido</div>
+                                                                    <input type="email" class="form-control" id="email" name="email" placeholder="Correo electrónico" required>
+                                                                    <div class="invalid-feedback" style="width: 100%;">Correo inválido</div>
                                                                 </div>
                                                             </div>
                                                             <?php
-
                                                             // Consulta para obtener todos los productos
                                                             $query = "SELECT * FROM productos";
                                                             $resultado = mysqli_query($conexion, $query);
@@ -1143,11 +1141,15 @@ if (!isset($_SESSION['usuario_id'])) {
                                                                 <label class="form-label" for="product-list">Lista de Productos</label>
                                                                 <select class="mostrar_productos" id="product-list" name="product-list" size="5" style="margin-bottom: 10px;">
                                                                     <?php foreach ($productos as $producto) : ?>
-                                                                        <option value="<?php echo $producto['id']; ?>" data-stock="<?php echo $producto['stock']; ?>" data-precio="<?php echo $producto['precio']; ?>">
+                                                                        <option value="<?php echo $producto['id']; ?>" data-stock="<?php echo $producto['stock']; ?>" data-precio="<?php echo $producto['precio']; ?>" data-imagen="<?php echo $producto['imagen']; ?>">
                                                                             <?php echo ucwords($producto['nombre']); ?> $ <?php echo $producto['precio']; ?>
                                                                         </option>
                                                                     <?php endforeach; ?>
                                                                 </select>
+                                                            </div>
+
+                                                            <div class="alert alert-danger" role="alert" id="limite-alert" style="display: none;">
+                                                                Se ha excedido el límite de productos por venta. No se puede agregar más productos.
                                                             </div>
 
                                                             <div class="form-group">
@@ -1157,8 +1159,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                                                         <tr>
                                                                             <th>Producto</th>
                                                                             <th>Cantidad</th>
-                                                                            <th>Total x Und
-                                                                            <th>
+                                                                            <th>Total x Und</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -1166,116 +1167,212 @@ if (!isset($_SESSION['usuario_id'])) {
                                                                     </tbody>
                                                                 </table>
                                                             </div>
-                                                            <h4 class="mb-3">Medio de Pago</h4>
+                                                            <!-- Agregar este campo oculto para almacenar los productos seleccionados -->
+                                                            <input type="hidden" id="productos-seleccionados" name="productos_seleccionados" value="">
+                                                            <?php
+                                                            // Consulta para obtener todos los productos
+                                                            $query = "SELECT * FROM productos";
+                                                            $resultado = mysqli_query($conexion, $query);
+                                                            $productos = array();
 
+                                                            // Obtener todos los productos y almacenarlos en un array
+                                                            while ($fila = mysqli_fetch_assoc($resultado)) {
+                                                                $productos[] = $fila;
+                                                            }
+                                                            ?>
+                                                            <h4 class="mb-3">Medio de Pago</h4>
                                                             <div class="d-block my-3">
-                                                                <div class="form-check custom-radio mb-2">
-                                                                    <input id="credit" name="paymentMethod" type="radio" class="form-check-input" checked="" required="">
-                                                                    <label class="form-check-label" for="credit">Tarjeta de Credito</label>
-                                                                </div>
-                                                                <div class="form-check custom-radio mb-2">
-                                                                    <input id="debit" name="paymentMethod" type="radio" class="form-check-input" required="">
-                                                                    <label class="form-check-label" for="debit">Banca Movil</label>
-                                                                </div>
-                                                                <div class="form-check custom-radio mb-2">
-                                                                    <input id="paypal" name="paymentMethod" type="radio" class="form-check-input" required="">
-                                                                    <label class="form-check-label" for="paypal">Efectivo</label>
-                                                                </div>
+                                                                <label for="paymentMethod">Método de Pago:</label>
+                                                                <select id="paymentMethod" name="paymentMethod" required>
+                                                                    <option value="efectivo">Efectivo</option>
+                                                                    <option value="tarjeta">Tarjeta de Crédito</option>
+                                                                    <option value="bancomovil">Banca Movil</option>
+                                                                </select>
                                                             </div>
                                                             <hr class="mb-4">
                                                             <button class="btn btn-primary btn-lg btn-block" type="submit">Terminar Venta</button>
-                                                        </form>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                </form>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Cerrar</button>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                 <script>
-                        $(document).ready(function() {
-                            // Función para filtrar la lista de productos según el término de búsqueda
-                            $('#buscarProducto').on('input', function() {
-                                var searchTerm = $(this).val().toLowerCase();
-                                $('#product-list option').each(function() {
-                                    var textoProducto = $(this).text().toLowerCase();
-                                    if (textoProducto.indexOf(searchTerm) === -1) {
-                                        $(this).prop('hidden', true);
-                                    } else {
-                                        $(this).prop('hidden', false);
-                                    }
-                                });
+                    $(document).ready(function() {
+                        var limiteProductosVenta = 50;
+                        // Función para filtrar la lista de productos según el término de búsqueda
+                        $('#buscarProducto').on('input', function() {
+                            var searchTerm = $(this).val().toLowerCase();
+                            $('#product-list option').each(function() {
+                                var textoProducto = $(this).text().toLowerCase();
+                                if (textoProducto.indexOf(searchTerm) === -1) {
+                                    $(this).prop('hidden', true);
+                                } else {
+                                    $(this).prop('hidden', false);
+                                }
                             });
+                        });
 
-                            // Función para agregar productos a la tabla cuando se seleccionan en el select
-                            $('#product-list').change(function() {
-                                var selectedOption = $(this).find(':selected');
-                                var producto = selectedOption.text();
-                                var productoId = selectedOption.val();
-                                var productoPrecio = selectedOption.data('precio');
+                        // Función para agregar productos a la tabla cuando se seleccionan en el select
+                        $('#product-list').change(function() {
+                            var totalProductosSeleccionados = $('#tabla-productos tbody tr').length;
 
-                                // Verificar si el producto ya está en la tabla
-                                var existeProducto = false;
-                                $('#tabla-productos tbody tr').each(function() {
-                                    if ($(this).data('producto-id') === productoId) {
-                                        existeProducto = true;
-                                        return false; // Terminar el bucle
-                                    }
-                                });
+                            if (totalProductosSeleccionados >= limiteProductosVenta) {
+                                $('#limite-alert').show();
+                                $('#exito-alert').hide();
+                                return; // Salir de la función si se excede el límite
+                            }
 
-                                // Si el producto no está en la tabla, agregarlo al principio
-                                if (!existeProducto) {
-                                    // Calcular el precio total
-                                    var precioTotal = productoPrecio * 1; // Multiplicar por 1 por defecto
+                            var selectedOption = $(this).find(':selected');
+                            var producto = selectedOption.text();
+                            var productoId = selectedOption.val();
+                            var productoPrecio = selectedOption.data('precio');
+                            var imagenProducto = selectedOption.data('imagen');
 
-                                    // Crear una nueva fila en la tabla para el producto seleccionado
-                                    var newRow = '<tr data-producto-id="' + productoId + '">' +
-                                        '<td>' + producto + '</td>' +
-                                        '<td><input type="number" class="form-control cantidad" value="1"></td>' +
-                                        '<td class="precio-unitario">' + productoPrecio + '</td>' +
-                                        '<td class="precio-total">' + precioTotal + '</td>' +
-                                        '</tr>';
-                                    $('#tabla-productos tbody').prepend(newRow);
-
-                                    // Agregar el producto seleccionado a la lista de productos
-                                    var nuevoItem = '<li class="list-group-item d-flex justify-content-between lh-condensed">' +
-                                        '<div>' +
-                                        '<h6 class="my-0">' + producto + '</h6>' +
-                                        '<small class="text-muted">Cantidad: <span class="cantidad-span">1</span></small>' +
-                                        '</div>' +
-                                        '<span class="text-muted">$' + precioTotal + '</span>' +
-                                        '</li>';
-                                    $('#productos-seleccionados').append(nuevoItem);
+                            // Verificar si el producto ya está en la tabla
+                            var existeProducto = false;
+                            $('#tabla-productos tbody tr').each(function() {
+                                if ($(this).data('producto-id') === productoId) {
+                                    existeProducto = true;
+                                    return false; // Terminar el bucle
                                 }
                             });
 
-                            // Función para actualizar la cantidad y el precio total en la lista de productos seleccionados
-                            $(document).on('input', '.cantidad', function() {
-                                var totalVenta = 0; // Inicializar el total de la venta
+                            // Si el producto no está en la tabla, agregarlo al principio
+                            if (!existeProducto) {
+                                // Calcular el precio total
+                                var precioTotal = productoPrecio * 1; // Multiplicar por 1 por defecto
 
-                                // Recorrer cada fila de la tabla de productos
-                                $('#tabla-productos tbody tr').each(function() {
-                                    var cantidad = $(this).find('.cantidad').val(); // Obtener la cantidad de productos
-                                    var precioUnitario = $(this).find('.precio-unitario').text(); // Obtener el precio unitario del producto
-                                    var precioTotal = cantidad * precioUnitario; // Calcular el precio total del producto
-                                    $(this).find('.precio-total').text(precioTotal); // Actualizar el precio total del producto en la tabla
+                                // Crear una nueva fila en la tabla para el producto seleccionado
+                                var newRow = '<tr data-producto-id="' + productoId + '">' +
+                                    '<td>' + producto + '</td>' +
+                                    '<td><input type="number" class="form-control cantidad" value="1"></td>' +
+                                    '<td class="precio-unitario">' + productoPrecio + '</td>' +
+                                    '<td class="precio-total">' + productoPrecio + '</td>' + // Inicializar el precio total con el precio unitario
+                                    '</tr>';
+                                $('#tabla-productos tbody').prepend(newRow);
 
-                                    totalVenta += precioTotal; // Sumar el precio total del producto al total de la venta
-                                });
+                                // Agregar los campos ocultos para el producto seleccionado
+                                var hiddenInputs = '<input type="hidden" name="productos[' + productoId + '][id]" value="' + productoId + '">' +
+                                    '<input type="hidden" name="productos[' + productoId + '][cantidad]" value="1">' + // Establecer la cantidad inicial
+                                    '<input type="hidden" name="productos[' + productoId + '][precio]" value="' + productoPrecio + '">';
+                                $('#productos-seleccionados').append(hiddenInputs);
 
-                                // Mostrar el total de la venta en la interfaz
-                                $('#total-colombiano').text('$' + totalVenta);
-                            });
+                                // Agregar el producto seleccionado a la lista de productos
+                                var nuevoItem = '<li class="list-group-item d-flex justify-content-between lh-condensed">' +
+                                    '<div>' +
+                                    '<h6 class="my-0">' + producto + '</h6>' +
+                                    '</div>' +
+                                    '<img src="' + imagenProducto + '" class="imagen_lista_productos" alt="Imagen del Producto">' + // Agregar la imagen del producto
+                                    '</li>';
+                                $('#productos-seleccionados').append(nuevoItem);
+                                selectedOption.remove();
+
+                                $('#limite-alert').hide();
+                                $('#exito-alert').show();
+                            }
+                            var totalProductos = $('#tabla-productos tbody tr').length;
+                            // Actualizar el contador en la interfaz
+                            $('#contador-productos-seleccionados').text(totalProductos);
+                            // Calcular el total de la venta
+                            actualizarTotalVenta();
                         });
+
+                        // Función para actualizar el valor del campo oculto con los productos seleccionados
+                        function actualizarProductosSeleccionados() {
+                            var productosSeleccionados = [];
+
+                            // Recorrer todas las filas de la tabla de productos
+                            $('#tabla-productos tbody tr').each(function() {
+                                var productoId = $(this).data('producto-id');
+                                var cantidad = $(this).find('.cantidad').val();
+                                var precioUnitario = $(this).find('.precio-unitario').text();
+
+                                // Agregar el producto a la lista de productos seleccionados
+                                productosSeleccionados.push({
+                                    id: productoId,
+                                    cantidad: cantidad,
+                                    precio: precioUnitario
+                                });
+                            });
+
+                            // Actualizar el valor del campo oculto con la lista de productos seleccionados en formato JSON
+                            $('#productos-seleccionados').val(JSON.stringify(productosSeleccionados));
+                        }
+                        // Función para eliminar productos de la tabla
+                        $(document).on('click', '.eliminar-producto', function() {
+                            var productoId = $(this).closest('tr').data('producto-id');
+                            // Habilitar la opción del producto en el select
+                            var productoNombre = $(this).closest('tr').find('td:first').text();
+                            $('#product-list').append($('<option>', {
+                                value: productoId,
+                                text: productoNombre
+                            }));
+                            $(this).closest('tr').remove();
+
+                            // Calcular el total de productos seleccionados
+                            var totalProductos = $('#tabla-productos tbody tr').length;
+                            // Actualizar el contador en la interfaz
+                            $('#contador-productos-seleccionados').text(totalProductos);
+                        });
+                        // Función para actualizar la cantidad y el precio total en la lista de productos seleccionados
+                        $(document).on('input', '.cantidad', function() {
+                            // Calcular el total de la venta
+                            actualizarTotalVenta();
+                        });
+
+                        // Función para calcular el total de la venta
+                        function actualizarTotalVenta() {
+                            var totalVenta = 0; // Inicializar el total de la venta
+
+                            // Recorrer cada fila de la tabla de productos
+                            $('#tabla-productos tbody tr').each(function() {
+                                var cantidad = parseInt($(this).find('.cantidad').val()); // Obtener la cantidad de productos
+                                var precioUnitario = parseFloat($(this).find('.precio-unitario').text()); // Obtener el precio unitario del producto
+                                var precioTotal = cantidad * precioUnitario; // Calcular el precio total del producto
+
+                                totalVenta += precioTotal; // Sumar el precio total del producto al total de la venta
+                            });
+
+                            // Mostrar el total de la venta en la interfaz
+                            $('#total_venta').val(totalVenta);
+                            $('#total-colombiano').text('$' + totalVenta.toFixed(0));
+                        }
+                    });
+                    $(document).on('input', '.cantidad', function() {
+                        var cantidad = parseInt($(this).val()); // Obtener la cantidad de productos
+                        var precioUnitario = parseFloat($(this).closest('tr').find('.precio-unitario').text()); // Obtener el precio unitario del producto
+                        var precioTotal = cantidad * precioUnitario; // Calcular el precio total del producto
+
+                        // Actualizar el precio total en la tabla
+                        $(this).closest('tr').find('.precio-total').text(precioTotal);
+
+                        // Calcular el total de la venta
+                        actualizarTotalVenta();
+                    });
+                    // Llama a la función actualizarTotalVenta cuando se agrega o elimina un producto del carrito
+                    $(document).on('change', '.cantidad', function() {
+                        actualizarTotalVenta();
+                    });
+
+                    $(document).on('click', '.eliminar-producto', function() {
+                        actualizarTotalVenta();
+                    });
                 </script>
+
+
+
+
 
                 <!-- row -->
                 <div class="row">
