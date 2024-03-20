@@ -1,9 +1,6 @@
-﻿<?php
+<?php
 // Iniciar la sesión
 session_start();
-
-
-
 
 // Verificar si el usuario ha iniciado sesión
 if (isset($_SESSION['usuario_id'])) {
@@ -18,13 +15,6 @@ if (isset($_SESSION['usuario_id'])) {
 if (!isset($_SESSION['usuario_id'])) {
 	// Si no ha iniciado sesión, redirigir a la página de inicio de sesión
 	header("Location: iniciar_sesion.php");
-	exit();
-}
-
-// Verificar si el usuario tiene el rol de administrador
-if ($_SESSION['rol'] != 'administrador') {
-	// Si el usuario no es administrador, redirigir a alguna página de error o a otra página adecuada
-	header("Location: dashboard_cajero.php");
 	exit();
 }
 ?>
@@ -512,9 +502,8 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Dashboard</span>
 						</a>
 						<ul aria-expanded="false">
-							<li><a href="dashboard_admin.php">Dashboard</a></li>
+							<li><a href="dashboard_cajero.php">Dashboard</a></li>
 						</ul>
-
 					</li>
 
 					<li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
@@ -523,15 +512,6 @@ if ($_SESSION['rol'] != 'administrador') {
 						</a>
 						<ul aria-expanded="false">
 							<li><a href="ventas.php">Ventas</a></li>
-						</ul>
-					</li>
-					<li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
-							<i class="fas fa-chart-line"></i>
-							<span class="nav-text">Compras</span>
-						</a>
-						<ul aria-expanded="false">
-							<li><a href="proveedores.php">Proveedores</a></li>
-							<li><a href="proveedores_eliminados.php">Proveedores Inactivos</a></li>
 						</ul>
 					</li>
 					<li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
