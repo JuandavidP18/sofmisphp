@@ -21,7 +21,7 @@ if (!isset($_SESSION['usuario_id'])) {
 // Verificar si el usuario tiene el rol de administrador
 if ($_SESSION['rol'] != 'administrador') {
     // Si el usuario no es administrador, redirigir a alguna página de error o a otra página adecuada
-    header("Location: pagina_de_error.php");
+    header("Location: dashboard_cajero.php");
     exit();
 }
 ?>
@@ -449,8 +449,7 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Dashboard</span>
 						</a>
                         <ul aria-expanded="false">
-							<li><a href="index.html">Dashboard</a></li>
-							<li><a href="index-2.html">Ventas</a></li>
+							<li><a href="dashboard.php">Dashboard</a></li>
 						</ul>
 
                     </li>
@@ -460,9 +459,7 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Ventas</span>
 						</a>
                         <ul aria-expanded="false">
-                            <li><a href="app-profile.html">Ventas</a></li>
-							<li><a href="post-details.html">Ventas Terminadas</a></li>
-                            <li><a href="app-calender.html">Ventas Guardadas</a></li>
+                            <li><a href="ventas.php">Ventas</a></li>
                         </ul>
                     </li>
                     <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
@@ -470,8 +467,8 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Compras</span>
 						</a>
                         <ul aria-expanded="false">
-                            <li><a href="chart-flot.html">Proveedores</a></li>
-                            <li><a href="chart-morris.html">Proveedores Eliminados</a></li>
+                            <li><a href="proveedores.php">Proveedores</a></li>
+                            <li><a href="proveedores_eliminados.php">Proveedores Inactivos</a></li>
                         </ul>
                     </li>
                     <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
@@ -479,9 +476,8 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Inventario</span>
 						</a>
                         <ul aria-expanded="false">
-                            <li><a href="ui-accordion.html">Productos</a></li>
-                            <li><a href="ui-alert.html">Productos Inactivos</a></li>
-                            <li><a href="ui-badge.html">Prodcutos Elimnados</a></li>
+                            <li><a href="inventario.php">Productos</a></li>
+                            <li><a href="inventario_inactivo.php">Productos Elimnados</a></li>
                         </ul>
                     </li>
                     <li><a class="has-arrow " href="javascript:void()" aria-expanded="false">
@@ -489,7 +485,7 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Reportes</span>
 						</a>
                         <ul aria-expanded="false">
-                            <li><a href="uc-select2.html">Reportes</a></li>
+                            <li><a href="reportes.php">Reportes</a></li>
 
                         </ul>
                     </li>
@@ -498,13 +494,13 @@ if ($_SESSION['rol'] != 'administrador') {
 							<span class="nav-text">Usuarios</span>
 						</a>
                         <ul aria-expanded="false">
-                            <li><a href="form-element.html">Cuentas Habilitadas</a></li>
-                            <li><a href="form-wizard.html">Cuentas Inabiltiadas</a></li>
+                            <li><a href="usuarios.php">Cuentas Habilitadas</a></li>
+                            <li><a href="usuarios_inavilitados.php">Cuentas Inabiltiadas</a></li>
                         </ul>
                     </li>				
 				<div class="copyright">
-					<p><strong>Fillow Saas Admin</strong> © 2021 All Rights Reserved</p>
-					<p class="fs-12">Made with <span class="heart"></span> by DexignLabs</p>
+					<p><strong>GAES 3 </strong> © 2024 SENA</p>
+					<p class="fs-12">Hecho por <span class="heart"></span>#3</p>
 				</div>
 			</div>
         </div>

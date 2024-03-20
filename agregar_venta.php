@@ -49,8 +49,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    // Generar un código único de venta
+    $codigo_venta = "SOF" . date("Ymd") . "-" . sprintf("%04d", rand(0, 9999));
+
+    // Verificar si el código generado ya existe en la base de datos
+    // Si existe, generar otro código único
+    $query_check_codigo = "SELECT COUNT(*) AS count FROM ventas WHERE codigo_venta = '$codigo_venta'";
+    $result_check_codigo = mysqli_query($conexion, $query_check_codigo);
+    $row_check_codigo = mysqli_fetch_assoc($result_check_codigo);
+    $count = $row_check_codigo['count'];
+
+    // Si el código generado ya existe, generar otro código único
+    while ($count > 0) {
+        $codigo_venta = "SOF" . date("Ymd") . "-" . sprintf("%04d", rand(0, 9999));
+        $query_check_codigo = "SELECT COUNT(*) AS count FROM ventas WHERE codigo_venta = '$codigo_venta'";
+        $result_check_codigo = mysqli_query($conexion, $query_check_codigo);
+        $row_check_codigo = mysqli_fetch_assoc($result_check_codigo);
+        $count = $row_check_codigo['count'];
+    }
+
     // Insertar la venta en la base de datos
-    $query_venta = "INSERT INTO ventas (fecha_venta, total_venta, medio_pago, cliente_id, usuario_id) VALUES (NOW(), $total_venta, '$metodo_pago_escaped', $cliente_id, $usuario_id)";
+    $query_venta = "INSERT INTO ventas (codigo_venta, fecha_venta, total_venta, medio_pago, cliente_id, usuario_id) VALUES ('$codigo_venta', NOW(), $total_venta, '$metodo_pago_escaped', $cliente_id, $usuario_id)";
 
     if (mysqli_query($conexion, $query_venta)) {
         // Obtener el ID de la venta insertada
@@ -65,9 +84,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $precio_unitario = $producto['precio'];
 
                 // Verificar si el producto existe en la base de datos
-                $query_producto = "SELECT id FROM productos WHERE id = $producto_id";
+                $query_producto = "SELECT id, stock FROM productos WHERE id = $producto_id";
                 $resultado_producto = mysqli_query($conexion, $query_producto);
                 if (mysqli_num_rows($resultado_producto) > 0) {
+                    // Obtener el stock actual del producto
+                    $fila_producto = mysqli_fetch_assoc($resultado_producto);
+                    $stock_actual = $fila_producto['stock'];
+
+                    // Verificar si hay suficiente stock para la venta
+                    if ($stock_actual >= $cantidad) {
+                        // Calcular el nuevo stock después de la venta
+                        $nuevo_stock = $stock_actual - $cantidad;
+
+                        // Actualizar el stock del producto en la base de datos
+                        $query_actualizar_stock = "UPDATE productos SET stock = $nuevo_stock WHERE id = $producto_id";
+                        if (!mysqli_query($conexion, $query_actualizar_stock)) {
+                            echo "Error al actualizar el stock del producto: " . mysqli_error($conexion);
+                        }
+                    } else {
+                        echo "No hay suficiente stock disponible para el producto con ID $producto_id.";
+                    }
+
                     // Insertar el producto en la tabla detalle_venta
                     $query_insertar_producto = "INSERT INTO detalle_venta (venta_id, producto_id, cantidad, precio_unitario) VALUES ($venta_id, $producto_id, $cantidad, $precio_unitario)";
                     if (!mysqli_query($conexion, $query_insertar_producto)) {

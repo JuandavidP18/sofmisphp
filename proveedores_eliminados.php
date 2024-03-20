@@ -508,14 +508,103 @@ if (!isset($_SESSION['usuario_id'])) {
                     <div class="diseño_titulos">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item active"><a href="javascript:void(0)">Productos</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:void(0)">Inventario</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0)">Proveedores</a></li>
                         </ol>
-                        <div class="row">
-                            <div class="nombre_logo">
-                                <button type="hidden" class="btn btn-primary">
-                                    </span>Eliminar</button>
-                                <button type="hidden" class="btn btn-primary">
-                                    </span>Restaurar</button>
+                        <button type="button" class="btn btn-rounded btn-info" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"><span class="btn-icon-start text-info"><i class="fa fa-plus color-info"></i>
+                            </span>Añadir</button>
+                    </div>
+                </div>
+                <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Registrar Proveedor</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="proveedores.php" method="POST">
+                                    <div class="row">
+                                        <div class="mb-3 col-md-6">
+                                            <label for="nombre" class="form-label">Nombre del Proveedor</label>
+                                            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre del proveedor" required>
+                                        </div>
+                                        <div class="mb-3 col-md-6">
+                                            <label for="direccion" class="form-label">Dirección</label>
+                                            <input type="text" id="direccion" name="direccion" class="form-control" placeholder="Dirección" required>
+                                        </div>
+                                        <div class="mb-3 col-md-6">
+                                            <label for="telefono" class="form-label">Teléfono</label>
+                                            <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="Teléfono" required>
+                                        </div>
+                                        <div class="mb-3 col-md-6">
+                                            <label for="telefono_local" class="form-label">Teléfono Local</label>
+                                            <input type="tel" id="telefono_local" name="telefono_local" class="form-control" placeholder="Teléfono local">
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="mb-3 col-md-6">
+                                            <label for="correo" class="form-label">Correo Electrónico</label>
+                                            <input type="email" id="correo" name="correo" class="form-control" placeholder="Correo electrónico" required>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Registrar</button>
+                                    <button type="button" class="btn btn-light">Limpiar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php
+
+                // Verificar si hay una sesión activa
+                if (!isset($_SESSION['usuario_id'])) {
+                    // Si no hay una sesión activa, redirigir al usuario al formulario de inicio de sesión
+                    header("Location: login.php");
+                    exit();
+                }
+
+                // Verificar si se ha enviado el formulario
+                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                    // Recuperar los datos del formulario
+                    $nombre = $_POST['nombre'];
+                    $direccion = $_POST['direccion'];
+                    $telefono = $_POST['telefono'];
+                    $telefono_local = isset($_POST['telefono_local']) ? $_POST['telefono_local'] : null;
+                    $correo = $_POST['correo'];
+                    $usuario_id = $_SESSION['usuario_id']; // Obtener el ID del usuario activo en la sesión
+
+                    // Verificar si se proporcionó el teléfono local
+                    if ($telefono_local === null || $telefono_local === '') {
+                        $telefono_local = null; // Si no se proporciona, establecer como null
+                    }
+
+                    // Obtener la fecha actual con zona horaria de Colombia
+                    date_default_timezone_set('America/Bogota');
+                    $fecha_creacion = date('Y-m-d H:i:s');
+
+                    // Estado por defecto
+                    $estado = 'Activo';
+
+                    // Insertar datos en la tabla de proveedores
+                    $sql = "INSERT INTO Proveedores (nombre, direccion, telefono, telefono_local, correo, fecha_creacion, estado, usuario_id)
+            VALUES ('$nombre', '$direccion', '$telefono', '$telefono_local', '$correo', '$fecha_creacion', '$estado', '$usuario_id')";
+
+                    if ($conexion->query($sql) === TRUE) {
+                        #proveedor registrado exitosamente 
+                    } else {
+                        echo "Error al registrar el proveedor: " . $conexion->error;
+                    }
+                }
+                ?>
+
+                <div class="modal fade" id="modalRegistroProveedor">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            </div>
+                            <div class="modal-body">
+                                <p>Registro Exitoso</p>
                             </div>
                         </div>
                     </div>
@@ -525,80 +614,147 @@ if (!isset($_SESSION['usuario_id'])) {
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Productos</h4>
+                                <h4 class="card-title">Lista de Proveedores</h4>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
-                                    <table id="example3" class="display" style="min-width: 845px">
+                                    <?php
+                                    // Consulta para obtener todos los usuarios registrados
+                                    $sql = "SELECT * FROM Proveedores WHERE estado = 'inactivo'";
+                                    $resultado = $conexion->query($sql);
+                                    ?>
+
+                                    <table id="example4" class="display" style="min-width: 845px">
                                         <thead>
                                             <tr>
-                                                <th>
-                                                    <div class="form-check custom-checkbox ms-2">
-                                                        <input type="checkbox" class="form-check-input" id="checkAll" required="">
-                                                        <label class="form-check-label" for="checkAll"></label>
-                                                    </div>
-                                                </th>
-                                                <th></th>
                                                 <th>Nombre</th>
-                                                <th>Código</th>
-                                                <th>Categoría</th>
-                                                <th>Marca</th>
-                                                <th>Precio</th>
-                                                <th>Stock</th>
+                                                <th>Dirección</th>
+                                                <th>Teléfono</th>
+                                                <th>Correo</th>
                                                 <th>Estado</th>
-                                                <th>Acción</th>
+                                                <th>Fecha de Unión</th>
+                                                <th>Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            // Consulta SQL para seleccionar todos los productos
-                                            $sql = "SELECT * FROM Productos WHERE eliminacion = 'Si'";
-                                            $resultado = $conexion->query($sql);
-
-                                            // Comprobar si se encontraron resultados
+                                            // Verificar si se encontraron resultados
                                             if ($resultado->num_rows > 0) {
-                                                // Iterar sobre los resultados y construir las filas de la tabla
-                                                while ($row = $resultado->fetch_assoc()) {
+                                                // Iterar sobre cada usuario y mostrarlos en la tabla
+                                                while ($fila = $resultado->fetch_assoc()) {
                                                     echo '<tr>';
-                                                    echo '<td>
-                                                            <div class="form-check custom-checkbox ms-2">
-                                                                <input type="checkbox" class="form-check-input" id="customCheckBox2" required="">
-                                                                <label class="form-check-label" for="customCheckBox2"></label>
-                                                            </div>
-                                                        </td>';
-                                                    echo '<td><img class="rounded-circle" width="35" src="' . $row['imagen'] . '" alt=""></td>';
-                                                    echo '<td>' . $row['nombre'] . '</td>';
-                                                    echo '<td>' . $row['codigo'] . '</td>';
-                                                    echo '<td>' . $row['categoria'] . '</td>';
-                                                    echo '<td>' . $row['marca'] . '</td>';
-                                                    echo '<td>$' . $row['precio'] . '</td>';
-                                                    echo '<td>' . $row['stock'] . '</td>';
+                                                    echo '<td>' . $fila['nombre'] . '</td>';
+                                                    echo '<td>' . $fila['direccion'] . '</td>';
+                                                    echo '<td>' . $fila['telefono'] . '</td>';
+                                                    echo '<td>' . $fila['correo'] . '</td>';
                                                     echo '<td>';
-                                                    // Determinar el estado del producto y mostrar el badge correspondiente
-                                                    if ($row['stock'] >= 6) {
-                                                        echo '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>Disponible</span>';
-                                                    } elseif ($row['stock'] > 0 && $row['stock'] < 6) {
-                                                        echo '<span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>Alerta</span>';
+                                                    // Mostrar el estado del proveedor como una insignia de color
+                                                    if ($fila['estado'] == 'Activo') {
+                                                        echo '<span class="badge light badge-success">Activo</span>';
                                                     } else {
-                                                        echo '<span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>Agotado</span>';
+                                                        echo '<span class="badge light badge-danger">Inactivo</span>';
                                                     }
                                                     echo '</td>';
+                                                    echo '<td>' . $fila['fecha_creacion'] . '</td>';
                                                     echo '<td>';
                                                     echo '<div class="d-flex">';
-                                                    echo '<a href="#" class="btn btn-danger shadow btn-xs sharp eliminar-btn"   data-id="' . $row['id'] . '"><i class="fa fa-trash"></i></a>';
+                                                    // Modificar el enlace para incluir los datos del proveedor
+                                                    echo '<a href="#" class="btn btn-primary shadow btn-xs sharp me-1 edit-btn" data-id="' . $fila['id'] . '" data-nombre="' . $fila['nombre'] . '" data-direccion="' . $fila['direccion'] . '" data-telefono="' . $fila['telefono'] . '" data-correo="' . $fila['correo'] . '" data-estado="' . $fila['estado'] . '" data-telefono-local="' . $fila['telefono_local'] . '"><i class="fas fa-pencil-alt"></i></a>';
                                                     echo '</div>';
                                                     echo '</td>';
                                                     echo '</tr>';
                                                 }
                                             } else {
-                                                // Si no se encontraron productos, mostrar una fila indicando que no hay datos
-                                                echo '<tr>';
-                                                echo '<td colspan="9">No hay productos disponibles</td>';
-                                                echo '</tr>';
+                                                // Mostrar un mensaje si no se encontraron usuarios
+                                                echo '<tr><td colspan="7">No se encontraron proveedores registrados.</td></tr>';
                                             }
                                             ?>
                                         </tbody>
                                     </table>
+
+                                    <!-- Modal de Edición -->
+                                    <div class="modal fade" id="modalEditar" tabindex="-1" role="dialog" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Editar Proveedor</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="actualizar_proveedor.php" method="POST">
+                                                        <!-- Los campos ocultos para almacenar los datos del proveedor -->
+                                                        <input type="hidden" id="id_proveedor" name="proveedor_id">
+
+                                                        <div class="row">
+                                                            <div class="mb-3 col-md-6">
+                                                                <label for="nombre" class="form-label">Nombre del Proveedor</label>
+                                                                <input type="text" id="nombre_input" name="nombre" class="form-control" placeholder="Nombre del proveedor" required>
+                                                            </div>
+                                                            <div class="mb-3 col-md-6">
+                                                                <label for="direccion" class="form-label">Dirección</label>
+                                                                <input type="text" id="direccion_proveedor" name="direccion" class="form-control" placeholder="Dirección" required>
+                                                            </div>
+                                                            <div class="mb-3 col-md-6">
+                                                                <label for="telefono" class="form-label">Teléfono</label>
+                                                                <input type="tel" id="telefono_proveedor" name="telefono" class="form-control" placeholder="Teléfono" required>
+                                                            </div>
+                                                            <div class="mb-3 col-md-6">
+                                                                <label for="telefono_local" class="form-label">Teléfono Local</label>
+                                                                <input type="tel" id="telefono_local_proveedor" name="telefono_local" class="form-control" placeholder="Teléfono local">
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="mb-3 col-md-6">
+                                                                <label class="form-label">Estado</label>
+                                                                <select id="estado_proveedor" name="estado" class="default-select form-control wide" required>
+                                                                    <option value="Activo">Activo</option>
+                                                                    <option value="Inactivo">Inactivo</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="mb-3 col-md-6">
+                                                                <label for="correo" class="form-label">Correo Electrónico</label>
+                                                                <input type="email" id="correo_proveedor" name="correo" class="form-control" placeholder="Correo electrónico" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-primary">Actualizar</button>
+                                                            <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Cerrar</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                                    <!-- Bootstrap JS -->
+                                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+                                    <script>
+                                        // Función para abrir el modal cuando se hace clic en el botón de edición
+                                        $(document).on("click", ".edit-btn", function() {
+                                            var id = $(this).data('id');
+                                            var nombre = $(this).data('nombre');
+                                            var direccion = $(this).data('direccion');
+                                            var telefono = $(this).data('telefono');
+                                            var correo = $(this).data('correo');
+                                            var estado = $(this).data('estado');
+                                            var telefono_local = $(this).data('telefono-local');
+
+                                            // Asignar los datos del proveedor a los campos del formulario modal}
+                                            $("#id_proveedor").val(id);
+                                            $("#nombre_input").val(nombre);
+                                            $("#nombre_proveedor").val(nombre);
+                                            $("#direccion_proveedor").val(direccion);
+                                            $("#telefono_proveedor").val(telefono);
+                                            $("#correo_proveedor").val(correo);
+                                            $("#estado_proveedor").val(estado);
+                                            $("#telefono_local_proveedor").val(telefono_local);
+
+                                            // Abrir el modal
+                                            $("#modalEditar").modal("show");
+                                        });
+                                    </script>
 
                                 </div>
                             </div>
@@ -606,43 +762,6 @@ if (!isset($_SESSION['usuario_id'])) {
                     </div>
                 </div>
             </div>
-
-            <div class="modal fade" id="ModalEliminarProducto" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Confirmación de Eliminación</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                ¿Estás seguro que deseas eliminar este producto? <br>
-                                Ya no se podra recuperar este producto
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Cancelar</button>
-                                <!-- Formulario para enviar el ID del producto a marcar como eliminado -->
-                                <form action="eliminar_producto.php" method="POST">
-                                    <input type="hidden" id="id_producto_el" name="id_producto">
-                                    <button type="submit" class="btn btn-primary">Eliminar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script>
-                    $(document).on("click", ".eliminar-btn", function() {
-                        var id = $(this).data('id');
-                        // Asignar los datos del producto a los campos del formulario modal
-                        $("#id_producto_el").val(id);
-
-                        // Abrir el modal
-                        $("#ModalEliminarProducto").modal("show");
-                    });
-                </script>
             <!--**********************************
             Content body end
         ***********************************-->

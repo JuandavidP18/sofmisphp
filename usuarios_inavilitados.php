@@ -1,66 +1,72 @@
 <?php
-// Incluir archivo de conexión a la base de datos
-include 'conexion.php';
-
 // Iniciar la sesión
 session_start();
 
-// Verificar si hay una sesión activa
+// Verificar si el usuario ha iniciado sesión
+if (isset($_SESSION['usuario_id'])) {
+    // Obtener el rol del usuario
+    $rol_usuario = $_SESSION['rol'];
+} else {
+    // Si el usuario no ha iniciado sesión, puedes manejar esto de alguna manera
+    $rol_usuario = "Rol no disponible";
+}
+
+// Verificar si el usuario ha iniciado sesión
 if (!isset($_SESSION['usuario_id'])) {
-    // Si no hay una sesión activa, redirigir al usuario al formulario de inicio de sesión
-    header("Location: login.php");
+    // Si no ha iniciado sesión, redirigir a la página de inicio de sesión
+    header("Location: iniciar_sesion.php");
     exit();
 }
 
-// Resto del código de tu archivo login.php
-// ...
+// Verificar si el usuario tiene el rol de administrador
+if ($_SESSION['rol'] != 'administrador') {
+    // Si el usuario no es administrador, redirigir a alguna página de error o a otra página adecuada
+    header("Location: dashboard_cajero.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="keywords" content="">
-    <meta name="author" content="">
-    <meta name="robots" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template">
-    <meta property="og:title" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template">
-    <meta property="og:description" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template">
-    <meta property="og:image" content="https://fillow.dexignlab.com/xhtml/social-image.png">
-    <meta name="format-detection" content="telephone=no">
-
-    <!-- PAGE TITLE HERE -->
-    <title>Admin Dashboard</title>
-
-    <!-- FAVICONS ICON -->
-    <link rel="shortcut icon" type="image/png" href="images/favicon.png">
-    <!-- Datatable -->
-    <link href="vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
-    <!-- Custom Stylesheet -->
-    <link href="vendor/jquery-nice-select/css/nice-select.css" rel="stylesheet">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="keywords" content="">
+	<meta name="author" content="">
+	<meta name="robots" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template">
+	<meta property="og:title" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template">
+	<meta property="og:description" content="Fillow : Fillow Saas Admin  Bootstrap 5 Template">
+	<meta property="og:image" content="https:/fillow.dexignlab.com/xhtml/social-image.png">
+	<meta name="format-detection" content="telephone=no">
+	
+	<!-- PAGE TITLE HERE -->
+	<title>Dashboard</title>
+	
+	<!-- FAVICONS ICON -->
+	<link rel="shortcut icon" type="image/png" href="images/favicon.png">
+	<link href="vendor/jquery-nice-select/css/nice-select.css" rel="stylesheet">
+	<link href="vendor/owl-carousel/owl.carousel.css" rel="stylesheet">
+	<link rel="stylesheet" href="vendor/nouislider/nouislider.min.css">
+	
+	<!-- Style css -->
     <link href="css/style.css" rel="stylesheet">
-    <link href="css/mio.css" rel="stylesheet">
-
-
+	
 </head>
-
 <body>
 
     <!--*******************
         Preloader start
     ********************-->
     <div id="preloader">
-        <div class="lds-ripple">
-            <div></div>
-            <div></div>
-        </div>
+		<div class="lds-ripple">
+			<div></div>
+			<div></div>
+		</div>
     </div>
     <!--*******************
         Preloader end
     ********************-->
-
 
     <!--**********************************
         Main wrapper start
@@ -70,17 +76,17 @@ if (!isset($_SESSION['usuario_id'])) {
         <!--**********************************
             Nav header start
         ***********************************-->
-        <div class="nav-header">
+		<div class="nav-header">
             <a href="index.html" class="brand-logo">
-                <svg class="logo-abbr" width="55" height="55" viewbox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M27.5 0C12.3122 0 0 12.3122 0 27.5C0 42.6878 12.3122 55 27.5 55C42.6878 55 55 42.6878 55 27.5C55 12.3122 42.6878 0 27.5 0ZM28.0092 46H19L19.0001 34.9784L19 27.5803V24.4779C19 14.3752 24.0922 10 35.3733 10V17.5571C29.8894 17.5571 28.0092 19.4663 28.0092 24.4779V27.5803H36V34.9784H28.0092V46Z" fill="url(#paint0_linear)"></path>
-                    <defs>
-                    </defs>
-                </svg>
-                <div class="brand-title">
-                    <h2 class="">Sofmis</h2>
-                    <span class="brand-sub-title">Administrador</span>
-                </div>
+				<svg class="logo-abbr" width="55" height="55" viewbox="0 0 55 55" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path fill-rule="evenodd" clip-rule="evenodd" d="M27.5 0C12.3122 0 0 12.3122 0 27.5C0 42.6878 12.3122 55 27.5 55C42.6878 55 55 42.6878 55 27.5C55 12.3122 42.6878 0 27.5 0ZM28.0092 46H19L19.0001 34.9784L19 27.5803V24.4779C19 14.3752 24.0922 10 35.3733 10V17.5571C29.8894 17.5571 28.0092 19.4663 28.0092 24.4779V27.5803H36V34.9784H28.0092V46Z" fill="url(#paint0_linear)"></path>
+					<defs>
+					</defs>
+				</svg>
+				<div class="brand-title">
+					<h2 class="">Sofmis</h2>
+					<span class="brand-sub-title"><?php echo $rol_usuario; ?></span>
+				</div>
             </a>
             <div class="nav-control">
                 <div class="hamburger">
@@ -91,8 +97,11 @@ if (!isset($_SESSION['usuario_id'])) {
         <!--**********************************
             Nav header end
         ***********************************-->
-
-        <div class="chatbox">
+		
+		<!--**********************************
+            Chat box start
+        ***********************************-->
+		<div class="chatbox">
 			<div class="chatbox-close"></div>
 			<div class="custom-tab-1">
 				<ul class="nav nav-tabs">
@@ -302,7 +311,7 @@ if (!isset($_SESSION['usuario_id'])) {
                     <div class="collapse navbar-collapse justify-content-between">
                         <div class="header-left">
 							<div class="dashboard_bar">
-                                Dashboard
+                                Usuarios Inabiltiados
                             </div>
                         </div>
                         <ul class="navbar-nav header-right">
@@ -502,197 +511,176 @@ if (!isset($_SESSION['usuario_id'])) {
             Content body start
         ***********************************-->
         <div class="content-body">
+            <!-- row -->
             <div class="container-fluid">
-
-                <div class="row page-titles">
-                    <div class="diseño_titulos">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Productos</a></li>
-                            <li class="breadcrumb-item"><a href="javascript:void(0)">Inventario</a></li>
-                        </ol>
-                        <div class="row">
-                            <div class="nombre_logo">
-                                <button type="hidden" class="btn btn-primary">
-                                    </span>Eliminar</button>
-                                <button type="hidden" class="btn btn-primary">
-                                    </span>Restaurar</button>
-                            </div>
-                        </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap">
+                    <div class="input-group contacts-search mb-4">
+                        <input type="text" class="form-control" placeholder="Search here...">
+                        <span class="input-group-text"><a href="javascript:void(0)"><i class="flaticon-381-search-2"></i></a></span>
+                    </div>
+                    <div class="mb-4">
+                        <a href="registrar.php" class="btn btn-primary btn-rounded fs-18"> Nuevo usuario</a>
                     </div>
                 </div>
-                <!-- row -->
                 <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Productos</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example3" class="display" style="min-width: 845px">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    <div class="form-check custom-checkbox ms-2">
-                                                        <input type="checkbox" class="form-check-input" id="checkAll" required="">
-                                                        <label class="form-check-label" for="checkAll"></label>
-                                                    </div>
-                                                </th>
-                                                <th></th>
-                                                <th>Nombre</th>
-                                                <th>Código</th>
-                                                <th>Categoría</th>
-                                                <th>Marca</th>
-                                                <th>Precio</th>
-                                                <th>Stock</th>
-                                                <th>Estado</th>
-                                                <th>Acción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            // Consulta SQL para seleccionar todos los productos
-                                            $sql = "SELECT * FROM Productos WHERE eliminacion = 'Si'";
-                                            $resultado = $conexion->query($sql);
+                    <div class="col-xl-12">
+                        <div class="row">
+                            <?php
 
-                                            // Comprobar si se encontraron resultados
-                                            if ($resultado->num_rows > 0) {
-                                                // Iterar sobre los resultados y construir las filas de la tabla
-                                                while ($row = $resultado->fetch_assoc()) {
-                                                    echo '<tr>';
-                                                    echo '<td>
-                                                            <div class="form-check custom-checkbox ms-2">
-                                                                <input type="checkbox" class="form-check-input" id="customCheckBox2" required="">
-                                                                <label class="form-check-label" for="customCheckBox2"></label>
-                                                            </div>
-                                                        </td>';
-                                                    echo '<td><img class="rounded-circle" width="35" src="' . $row['imagen'] . '" alt=""></td>';
-                                                    echo '<td>' . $row['nombre'] . '</td>';
-                                                    echo '<td>' . $row['codigo'] . '</td>';
-                                                    echo '<td>' . $row['categoria'] . '</td>';
-                                                    echo '<td>' . $row['marca'] . '</td>';
-                                                    echo '<td>$' . $row['precio'] . '</td>';
-                                                    echo '<td>' . $row['stock'] . '</td>';
-                                                    echo '<td>';
-                                                    // Determinar el estado del producto y mostrar el badge correspondiente
-                                                    if ($row['stock'] >= 6) {
-                                                        echo '<span class="badge light badge-success"><i class="fa fa-circle text-success me-1"></i>Disponible</span>';
-                                                    } elseif ($row['stock'] > 0 && $row['stock'] < 6) {
-                                                        echo '<span class="badge light badge-warning"><i class="fa fa-circle text-warning me-1"></i>Alerta</span>';
-                                                    } else {
-                                                        echo '<span class="badge light badge-danger"><i class="fa fa-circle text-danger me-1"></i>Agotado</span>';
-                                                    }
-                                                    echo '</td>';
-                                                    echo '<td>';
-                                                    echo '<div class="d-flex">';
-                                                    echo '<a href="#" class="btn btn-danger shadow btn-xs sharp eliminar-btn"   data-id="' . $row['id'] . '"><i class="fa fa-trash"></i></a>';
-                                                    echo '</div>';
-                                                    echo '</td>';
-                                                    echo '</tr>';
-                                                }
-                                            } else {
-                                                // Si no se encontraron productos, mostrar una fila indicando que no hay datos
-                                                echo '<tr>';
-                                                echo '<td colspan="9">No hay productos disponibles</td>';
-                                                echo '</tr>';
-                                            }
-                                            ?>
-                                        </tbody>
-                                    </table>
+                            include 'conexion.php';
 
-                                </div>
-                            </div>
+                            // Consulta SQL para obtener todos los usuarios registrados
+                            $sql = "SELECT * FROM usuarios WHERE cuenta_habilitada = '0'";
+                            $result = $conexion->query($sql);
+
+                            if ($result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    echo "<div class='col-xl-3 col-xxl-4 col-lg-4 col-md-6 col-sm-6 items'>";
+                                    echo "<div class='card contact-bx item-content'>";
+                                    echo "<div class='card-header border-0'>";
+                                    echo "<div class='action-dropdown'>";
+                                    echo "<div class='dropdown'>";
+                                    echo "<div class='btn-link' data-bs-toggle='dropdown'>";
+                                    echo "<svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>";
+                                    echo "<circle cx='12.4999' cy='3.5' r='2.5' fill='#A5A5A5'></circle>";
+                                    echo "<circle cx='12.4999' cy='11.5' r='2.5' fill='#A5A5A5'></circle>";
+                                    echo "<circle cx='12.4999' cy='19.5' r='2.5' fill='#A5A5A5'></circle>";
+                                    echo "</svg>";
+                                    echo "</div>";
+                                    echo "<div class='dropdown-menu dropdown-menu-right'>";
+                                    echo "<a class='dropdown-item' href='usuarios.php?id=" . $row["id"] . "&action=enable'>Habilitar</a>";
+                                    echo "<a class='dropdown-item' href='usuarios.php?id=" . $row["id"] . "&action=disable'>Desabilitar</a>";
+                                    echo "</div>";
+                                    echo "</div>";
+                                    echo "</div>";
+                                    echo "</div>";
+                                    echo "<div class='card-body user-profile'>";
+                                    echo "<div class='image-bx'>";
+                                    echo "<img src='images/pic1.jpg' data-src='images/contacts/Untitled-3.jpg' alt='' class='rounded-circle'>";
+                                    echo "<span class='active'></span>";
+                                    echo "</div>";
+                                    echo "<div class='media-body user-meta-info'>";
+                                    echo "<h6 class='fs-18 font-w600 my-1'><div href='' class='text-black user-name' data-name='Alan Green'>" . $row["nombre_usuario"] . "</div></h6>";
+                                    echo "<p class='fs-14 mb-3 user-work' data-occupation='UI Designer'>" . $row["rol"] . "</p>";
+                                    echo "<ul>";
+                                    echo "</ul>";
+                                    echo "</div>";
+                                    echo "</div>";
+                                    echo "</div>";
+                                    echo "</div>";
+                                }
+                            } else {
+                                echo "<div class='col-xl-12'>";
+                                echo "<p>No hay usuarios registrados.</p>";
+                                echo "</div>";
+                            }
+                            ?>
+                        </div>
+                        <div class="progect-pagination d-flex justify-content-between align-items-center flex-wrap mt-3">
+                            <h4 class="mb-3">Mostrando 10 de <?php echo $result->num_rows; ?> usuarios</h4>
+                            <ul class="pagination mb-3">
+                                <li class="page-item page-indicator">
+                                    <a class="page-link" href="javascript:void(0)">
+                                        <i class="fas fa-angle-double-left me-2"></i>Previous</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class=" active" href="javascript:void(0)">1</a>
+                                    <a class="" href="javascript:void(0)">2</a>
+                                    <a class="" href="javascript:void(0)">3</a>
+                                    <a class="" href="javascript:void(0)">4</a>
+                                </li>
+                                <li class="page-item page-indicator">
+                                    <a class="page-link" href="javascript:void(0)">
+                                        Next<i class="fas fa-angle-double-right ms-2"></i></a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="modal fade" id="ModalEliminarProducto" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Confirmación de Eliminación</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                ¿Estás seguro que deseas eliminar este producto? <br>
-                                Ya no se podra recuperar este producto
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-danger light" data-bs-dismiss="modal">Cancelar</button>
-                                <!-- Formulario para enviar el ID del producto a marcar como eliminado -->
-                                <form action="eliminar_producto.php" method="POST">
-                                    <input type="hidden" id="id_producto_el" name="id_producto">
-                                    <button type="submit" class="btn btn-primary">Eliminar</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <?php
+    // Verificar si se ha enviado un ID de usuario y la acción a realizar
+    if (isset($_GET['id']) && is_numeric($_GET['id']) && isset($_GET['action'])) {
+        $usuario_id = $_GET['id'];
+        $action = $_GET['action'];
 
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script>
-                    $(document).on("click", ".eliminar-btn", function() {
-                        var id = $(this).data('id');
-                        // Asignar los datos del producto a los campos del formulario modal
-                        $("#id_producto_el").val(id);
+        // Verificar la acción a realizar
+        if ($action === "enable" || $action === "disable") {
+            // Cambiar el estado de la cuenta
+            $nuevo_estado = ($action === "enable") ? 1 : 0;
+            $actualizar_estado = "UPDATE usuarios SET cuenta_habilitada = $nuevo_estado WHERE id = $usuario_id";
 
-                        // Abrir el modal
-                        $("#ModalEliminarProducto").modal("show");
-                    });
-                </script>
-            <!--**********************************
+            if ($conexion->query($actualizar_estado) === TRUE) {
+                echo "<div class='container mt-3'>";
+                echo "Estado de cuenta actualizado correctamente.";
+                echo "</div>";
+            } else {
+                echo "<div class='container mt-3'>";
+                echo "Error al actualizar el estado de la cuenta: " . $conexion->error;
+                echo "</div>";
+            }
+        } else {
+            echo "<div class='container mt-3'>";
+            echo "Acción no válida.";
+            echo "</div>";
+        }
+    }
+    ?>
+
+    <!--**********************************
             Content body end
         ***********************************-->
 
 
-            <!--**********************************
+
+
+    <!--**********************************
             Footer start
         ***********************************-->
-            <div class="footer">
-                <div class="copyright">
-                    <p>Copyright © Designed &amp; Developed by <a href="../index.htm" target="_blank">DexignLab</a> 2021</p>
-                </div>
-            </div>
-            <!--**********************************
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright © Designed &amp; Developed by <a href="../index.htm" target="_blank">DexignLab</a> 2021</p>
+        </div>
+    </div>
+    <!--**********************************
             Footer end
         ***********************************-->
 
-            <!--**********************************
+    <!--**********************************
            Support ticket button start
         ***********************************-->
 
-            <!--**********************************
+    <!--**********************************
            Support ticket button end
         ***********************************-->
 
 
-        </div>
-        <!--**********************************
+    </div>
+    <!--**********************************
         Main wrapper end
     ***********************************-->
 
-        <!--**********************************
+    <!--**********************************
         Scripts
     ***********************************-->
-        <!-- Required vendors -->
-        <script src="vendor/global/global.min.js"></script>
-        <script src="vendor/chart.js/Chart.bundle.min.js"></script>
-        <!-- Apex Chart -->
-        <script src="vendor/apexchart/apexchart.js"></script>
+    <!-- Required vendors -->
+    <script src="vendor/global/global.min.js"></script>
 
-        <!-- Datatable -->
-        <script src="vendor/datatables/js/jquery.dataTables.min.js"></script>
-        <script src="js/plugins-init/datatables.init.js"></script>
+    <script src="vendor/jquery-nice-select/js/jquery.nice-select.min.js"></script>
 
-        <script src="vendor/jquery-nice-select/js/jquery.nice-select.min.js"></script>
+    <!-- Apex Chart -->
+    <!-- Chart piety plugin files -->
+    <!-- Dashboard 1 -->
 
-        <script src="js/custom.min.js"></script>
-        <script src="js/dlabnav-init.js"></script>
-        <script src="js/demo.js"></script>
-        <script src="js/styleSwitcher.js"></script>
+    <script src="js/custom.min.js"></script>
+    <script src="js/dlabnav-init.js"></script>
+    <script src="js/demo.js"></script>
+    <script src="js/styleSwitcher.js"></script>
+
+
 </body>
 
 </html>

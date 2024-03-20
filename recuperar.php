@@ -81,75 +81,75 @@ document.getElementById('formulario-recuperar').addEventListener('submit', funct
 	<script src="js/styleSwitcher.js"></script>
 </body>
 </html>
-<?php
-// Incluir la biblioteca PHPMailer
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+    <?php
+    // Incluir la biblioteca PHPMailer
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
 
-require 'biblioteca/PHPMailer-master/src/Exception.php';
-require 'biblioteca/PHPMailer-master/src/PHPMailer.php';
-require 'biblioteca/PHPMailer-master/src/SMTP.php';
+    require 'biblioteca/PHPMailer-master/src/Exception.php';
+    require 'biblioteca/PHPMailer-master/src/PHPMailer.php';
+    require 'biblioteca/PHPMailer-master/src/SMTP.php';
 
-// Incluir el archivo de conexión
-include 'conexion.php';
+    // Incluir el archivo de conexión
+    include 'conexion.php';
 
-// Función para generar un código aleatorio
-function generarCodigo($longitud = 6) {
-    $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $codigo = '';
-    for ($i = 0; $i < $longitud; $i++) {
-        $codigo .= $caracteres[rand(0, strlen($caracteres) - 1)];
-    }
-    return $codigo;
-}
-
-// Verificar si se ha enviado el correo electrónico
-if(isset($_POST['email'])) {
-    $email = $_POST['email'];
-
-    // Consultar si el correo electrónico está registrado en la base de datos
-    $consulta_usuario = "SELECT * FROM usuarios WHERE correo_electronico = '$email'";
-    $resultado_usuario = $conexion->query($consulta_usuario);
-
-    if ($resultado_usuario->num_rows > 0) {
-        // El correo electrónico está registrado en la base de datos
-        // Generar un código único
-        $codigo = generarCodigo();
-
-        // Almacenar el código en la base de datos con una fecha de expiración (60 minutos)
-        $fecha_expiracion = date('Y-m-d H:i:s', strtotime('+60 minutes'));
-        $guardar_codigo = "INSERT INTO codigos_recuperacion (codigo, correo_electronico, fecha_expiracion) VALUES ('$codigo', '$email', '$fecha_expiracion')";
-        $conexion->query($guardar_codigo);
-
-        // Enviar el código por correo electrónico
-        $mail = new PHPMailer(true);
-        try {
-            $mail->isSMTP();
-            $mail->Host = 'smtp.gmail.com'; // Cambiar por el servidor SMTP
-            $mail->SMTPAuth = true;
-            $mail->Username = 'juandavidsierrapinzon@gmail.com'; // Cambiar por tu correo electrónico
-            $mail->Password = 'sdcreiwwnrxizxbu'; // Cambiar por tu contraseña de correo electrónico
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
-
-            $mail->setFrom('juandavidsierrapinzon@gmail.com', 'SOFMIS'); // Cambiar por tu correo electrónico y nombre
-            $mail->addAddress($email); // Añadir el correo electrónico del destinatario
-            $mail->isHTML(true);
-
-            $mail->Subject = 'Código de verificación';
-            $mail->Body = 'Tu código de verificación es: ' . $codigo;
-
-            $mail->send();
-
-            // Redireccionar al formulario de ingreso de código de verificación
-            header("Location: codigo_verificacion.php?email=$email");
-            exit();
-        } catch (Exception $e) {
-            echo 'Error al enviar el correo electrónico: ' . $mail->ErrorInfo;
+    // Función para generar un código aleatorio
+    function generarCodigo($longitud = 6) {
+        $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $codigo = '';
+        for ($i = 0; $i < $longitud; $i++) {
+            $codigo .= $caracteres[rand(0, strlen($caracteres) - 1)];
         }
-    } else {
-        // El correo electrónico no está registrado en la base de datos
-        echo "El correo electrónico no está registrado en nuestra base de datos.";
+        return $codigo;
     }
-}
-?>
+
+    // Verificar si se ha enviado el correo electrónico
+    if(isset($_POST['email'])) {
+        $email = $_POST['email'];
+
+        // Consultar si el correo electrónico está registrado en la base de datos
+        $consulta_usuario = "SELECT * FROM usuarios WHERE correo_electronico = '$email'";
+        $resultado_usuario = $conexion->query($consulta_usuario);
+
+        if ($resultado_usuario->num_rows > 0) {
+            // El correo electrónico está registrado en la base de datos
+            // Generar un código único
+            $codigo = generarCodigo();
+
+            // Almacenar el código en la base de datos con una fecha de expiración (60 minutos)
+            $fecha_expiracion = date('Y-m-d H:i:s', strtotime('+60 minutes'));
+            $guardar_codigo = "INSERT INTO codigos_recuperacion (codigo, correo_electronico, fecha_expiracion) VALUES ('$codigo', '$email', '$fecha_expiracion')";
+            $conexion->query($guardar_codigo);
+
+            // Enviar el código por correo electrónico
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com'; // Cambiar por el servidor SMTP
+                $mail->SMTPAuth = true;
+                $mail->Username = 'juandavidsierrapinzon@gmail.com'; // Cambiar por tu correo electrónico
+                $mail->Password = 'sdcreiwwnrxizxbu'; // Cambiar por tu contraseña de correo electrónico
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+
+                $mail->setFrom('juandavidsierrapinzon@gmail.com', 'SOFMIS'); // Cambiar por tu correo electrónico y nombre
+                $mail->addAddress($email); // Añadir el correo electrónico del destinatario
+                $mail->isHTML(true);
+
+                $mail->Subject = 'Código de verificación';
+                $mail->Body = 'Tu código de verificación es: ' . $codigo;
+
+                $mail->send();
+
+                // Redireccionar al formulario de ingreso de código de verificación
+                header("Location: codigo_verificacion.php?email=$email");
+                exit();
+            } catch (Exception $e) {
+                echo 'Error al enviar el correo electrónico: ' . $mail->ErrorInfo;
+            }
+        } else {
+            // El correo electrónico no está registrado en la base de datos
+            echo "El correo electrónico no está registrado en nuestra base de datos.";
+        }
+    }
+    ?>
