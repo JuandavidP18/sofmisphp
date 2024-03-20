@@ -1169,6 +1169,7 @@ if (!isset($_SESSION['usuario_id'])) {
                                                             </div>
                                                             <!-- Agregar este campo oculto para almacenar los productos seleccionados -->
                                                             <input type="hidden" id="productos-seleccionados" name="productos_seleccionados" value="">
+
                                                             <?php
                                                             // Consulta para obtener todos los productos
                                                             $query = "SELECT * FROM productos";
@@ -1251,20 +1252,27 @@ if (!isset($_SESSION['usuario_id'])) {
                             // Si el producto no está en la tabla, agregarlo al principio
                             if (!existeProducto) {
                                 // Calcular el precio total
-                                var precioTotal = productoPrecio * 1; // Multiplicar por 1 por defecto
+                                var cantidad = $(this).closest('tr').find('.cantidad').val();
+                                var cantidadInicial = cantidad || 1; // Si no se ingresa una cantidad, se establece en 1 por defecto
 
-                                // Crear una nueva fila en la tabla para el producto seleccionado
+                                // Crear la fila para el producto seleccionado en la tabla
                                 var newRow = '<tr data-producto-id="' + productoId + '">' +
                                     '<td>' + producto + '</td>' +
-                                    '<td><input type="number" class="form-control cantidad" value="1"></td>' +
+                                    '<td><input type="number" class="form-control cantidad" value="' + cantidadInicial + '"></td>' +
                                     '<td class="precio-unitario">' + productoPrecio + '</td>' +
-                                    '<td class="precio-total">' + productoPrecio + '</td>' + // Inicializar el precio total con el precio unitario
+                                    '<td class="precio-total">' + (cantidadInicial * productoPrecio) + '</td>' + // Calcular el precio total inicial
                                     '</tr>';
                                 $('#tabla-productos tbody').prepend(newRow);
 
-                                // Agregar los campos ocultos para el producto seleccionado
+                                // Actualizar el contador en la interfaz
+                                $('#contador-productos-seleccionados').text($('#tabla-productos tbody tr').length);
+
+                                // Calcular el total de la venta
+                                actualizarTotalVenta();
+
+                                // Agregar el producto seleccionado a la lista de productos
                                 var hiddenInputs = '<input type="hidden" name="productos[' + productoId + '][id]" value="' + productoId + '">' +
-                                    '<input type="hidden" name="productos[' + productoId + '][cantidad]" value="1">' + // Establecer la cantidad inicial
+                                    '<input type="hidden" name="productos[' + productoId + '][cantidad]" value="' + cantidadInicial + '">' +
                                     '<input type="hidden" name="productos[' + productoId + '][precio]" value="' + productoPrecio + '">';
                                 $('#productos-seleccionados').append(hiddenInputs);
 
@@ -1287,7 +1295,17 @@ if (!isset($_SESSION['usuario_id'])) {
                             // Calcular el total de la venta
                             actualizarTotalVenta();
                         });
+                        $(document).on('input', '.cantidad', function() {
+                            var cantidad = parseInt($(this).val());
+                            var precioUnitario = parseFloat($(this).closest('tr').find('.precio-unitario').text());
+                            var precioTotal = cantidad * precioUnitario;
+                            $(this).closest('tr').find('.precio-total').text(precioTotal);
+                            actualizarTotalVenta();
 
+                            // Actualizar el valor del input oculto de cantidad
+                            var productoId = $(this).closest('tr').data('producto-id');
+                            $('input[name="productos[' + productoId + '][cantidad]"]').val(cantidad);
+                        });
                         // Función para actualizar el valor del campo oculto con los productos seleccionados
                         function actualizarProductosSeleccionados() {
                             var productosSeleccionados = [];
@@ -1333,7 +1351,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
                         // Función para calcular el total de la venta
                         function actualizarTotalVenta() {
-                            var totalVenta = 0; // Inicializar el total de la venta
+                            var totalVenta = 0; // Inicializar el total de la venta 
 
                             // Recorrer cada fila de la tabla de productos
                             $('#tabla-productos tbody tr').each(function() {
@@ -1369,11 +1387,6 @@ if (!isset($_SESSION['usuario_id'])) {
                         actualizarTotalVenta();
                     });
                 </script>
-
-
-
-
-
                 <!-- row -->
                 <div class="row">
                     <div class="col-12">
