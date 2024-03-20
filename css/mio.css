@@ -46,3 +46,7 @@
     width: 100px;
     border: none;
 }
+.buton-derecha{
+    display: flex;
+    justify-content: right;
+}
